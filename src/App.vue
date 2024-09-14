@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <ComponentToolbar />
-    <!-- Barra de herramientas a la izquierda -->
     <div class="workspace" @dragover.prevent @drop="onDrop">
       <div
         v-for="(component, index) in droppedComponents"
         :key="index"
         class="dropped-component"
       >
+        <!-- Renderiza el DataObjectCard con el tipo seleccionado -->
         <DataObjectCard :type="component.type" />
       </div>
     </div>
@@ -16,8 +16,8 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import ComponentToolbar from "./components/ComponentToolbar.vue"; // Importa la barra de herramientas
-import DataObjectCard from "./components/DataObjectCard.vue"; // Importa el componente
+import ComponentToolbar from "./components/ComponentToolbar.vue";
+import DataObjectCard from "./components/DataObjectCard.vue";
 
 export default defineComponent({
   components: {
@@ -28,9 +28,10 @@ export default defineComponent({
     const droppedComponents = ref<{ type: string }[]>([]);
 
     function onDrop(event: DragEvent) {
-      const componentType = event.dataTransfer?.getData("component-type");
+      const componentType = event.dataTransfer?.getData("component-type"); // Obtener tipo desde dataTransfer
       if (componentType) {
-        droppedComponents.value.push({ type: componentType });
+        droppedComponents.value.push({ type: componentType }); // Agregar el componente con su tipo
+        console.log("Dropped component:", componentType);
       }
     }
 
@@ -48,21 +49,9 @@ export default defineComponent({
   height: 100vh; /* Asegurar que ocupe toda la altura de la ventana */
 }
 
-.component-toolbar {
-  width: 150px; /* Ancho fijo para la barra de herramientas */
-  background-color: #f4f4f4;
-  padding: 10px;
-  border-right: 1px solid #ddd;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  overflow-y: auto;
-}
-
 .workspace {
   flex-grow: 1;
-  margin-left: 150px; /* Reserva espacio para la barra de herramientas */
+  margin-left: 150px;
   padding: 20px;
   background-color: #f9f9f9;
   height: 100vh;
