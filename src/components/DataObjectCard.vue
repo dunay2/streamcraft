@@ -50,49 +50,50 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.dropped-component {
-  position: absolute;
+.data-object-card {
+  border: 1px solid #dfe6e9;
   padding: 10px;
-  border: 1px solid #ddd;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: move;
-  transition: transform 0.2s ease-in-out;
+  width: 160px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  /* Eliminamos cualquier sombra */
+  box-shadow: none;
+  margin-bottom: 10px;
+  /* Eliminamos cualquier transformación al hacer hover */
+  transition: none;
 }
 
-.data-object-card {
+.data-object-card:hover {
+  /* Aseguramos que no hay transformaciones en hover */
+  transform: none;
+  box-shadow: none;
+}
+
+.data-object-card h2 {
+  color: #2c3e50;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.data-object-card p {
+  color: #636e72;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.data-object-card button {
+  background-color: #42b983;
   border: 1px solid #ddd;
-  padding: 10px;
-  width: 200px;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
+  color: white;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
 
-  h2 {
-    color: #2c3e50;
-    font-size: 16px;
-  }
-
-  p {
-    color: #7f8c8d;
-    margin-bottom: 10px;
-    font-size: 14px;
-  }
-
-  button {
-    background-color: #42b983;
-    border: none;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-size: 14px;
-  }
-
-  button:hover {
-    background-color: #2d8f66;
-  }
+.data-object-card button:hover {
+  background-color: #36a273;
 }
 </style>

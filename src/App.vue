@@ -164,8 +164,8 @@ export default defineComponent({
 .workspace {
   position: relative;
   flex-grow: 1;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
+  background-color: #f0f3f4;
+  border: 1px solid #dfe6e9;
   margin-left: 200px;
   height: 100vh;
   overflow: hidden;
@@ -173,11 +173,16 @@ export default defineComponent({
 
 .dropped-component {
   position: absolute;
-  padding: 10px;
-  border: 1px solid #ddd;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0px;
+  border: none;
+  margin: 0;
+  background-color: transparent;
+  box-shadow: none;
   cursor: move;
   transition: transform 0.1s ease-in-out;
+}
+
+.dropped-component:hover {
+  box-shadow: none;
 }
 </style>
