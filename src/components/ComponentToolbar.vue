@@ -22,9 +22,7 @@ export default defineComponent({
     const components = ["Table", "View", "Transformation"];
 
     function onDragStart(component: string, event: DragEvent) {
-      // Recibir ambos parámetros
       event.dataTransfer?.setData("component-type", component);
-      console.log("Dragging component:", component);
     }
 
     return {
@@ -37,15 +35,14 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .component-toolbar {
-  width: 150px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px; /* Ajustamos el tamaño */
   background-color: #f4f4f4;
   padding: 10px;
   border-right: 1px solid #ddd;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  overflow-y: auto;
+  height: 100vh; /* Asegurar que ocupe toda la altura */
 }
 
 ul {

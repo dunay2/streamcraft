@@ -1,13 +1,16 @@
 <template>
   <div id="app">
     <ComponentToolbar />
-    <div class="workspace" @dragover.prevent @drop="onDrop">
+    <div id="canvas" class="workspace" @dragover.prevent @drop="onDrop">
       <div
         v-for="(component, index) in droppedComponents"
         :key="index"
         class="dropped-component"
+        :style="{ top: component.top + 'px', left: component.left + 'px' }"
+        draggable="true"
+        @dragstart="onDragStart(index, $event)"
+        @dragend="onDragEnd(index, $event)"
       >
-        <!-- Renderiza el DataObjectCard con el tipo seleccionado -->
         <DataObjectCard :type="component.type" />
       </div>
     </div>
@@ -25,19 +28,37 @@ export default defineComponent({
     DataObjectCard,
   },
   setup() {
-    const droppedComponents = ref<{ type: string }[]>([]);
+    const droppedComponents = ref<
+      { type: string; top: number; left: number }[]
+    >([]);
 
     function onDrop(event: DragEvent) {
-      const componentType = event.dataTransfer?.getData("component-type"); // Obtener tipo desde dataTransfer
+      const componentType = event.dataTransfer?.getData("component-type");
       if (componentType) {
-        droppedComponents.value.push({ type: componentType }); // Agregar el componente con su tipo
-        console.log("Dropped component:", componentType);
+        const canvas = document.getElementById("canvas") as HTMLDivElement;
+        const x = event.clientX - canvas.getBoundingClientRect().left;
+        const y = event.clientY - canvas.getBoundingClientRect().top;
+        droppedComponents.value.push({ type: componentType, top: y, left: x });
       }
+    }
+
+    function onDragStart(index: number, event: DragEvent) {
+      event.dataTransfer?.setData("component-index", index.toString());
+    }
+
+    function onDragEnd(index: number, event: DragEvent) {
+      const canvas = document.getElementById("canvas") as HTMLDivElement;
+      const x = event.clientX - canvas.getBoundingClientRect().left;
+      const y = event.clientY - canvas.getBoundingClientRect().top;
+      droppedComponents.value[index].top = y;
+      droppedComponents.value[index].left = x;
     }
 
     return {
       droppedComponents,
       onDrop,
+      onDragStart,
+      onDragEnd,
     };
   },
 });
@@ -46,25 +67,24 @@ export default defineComponent({
 <style scoped lang="scss">
 #app {
   display: flex;
-  height: 100vh; /* Asegurar que ocupe toda la altura de la ventana */
 }
 
 .workspace {
+  position: relative;
   flex-grow: 1;
-  margin-left: 150px;
-  padding: 20px;
   background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  margin-left: 200px; /* Espacio para la barra de herramientas */
   height: 100vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
 }
 
 .dropped-component {
+  position: absolute;
   padding: 10px;
   border: 1px solid #ddd;
-  margin-bottom: 10px;
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: move;
 }
 </style>
