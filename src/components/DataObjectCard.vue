@@ -45,6 +45,16 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.dropped-component {
+  position: absolute;
+  padding: 10px;
+  border: 1px solid #ddd;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: move;
+  transition: transform 0.2s ease-in-out;
+}
+
 .data-object-card {
   border: 1px solid #ddd;
   padding: 10px;

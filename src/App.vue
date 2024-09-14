@@ -32,24 +32,54 @@ export default defineComponent({
       { type: string; top: number; left: number }[]
     >([]);
 
+    // Variables para almacenar el offset del clic dentro del componente
+    const clickOffset = ref({ x: 0, y: 0 });
+
     function onDrop(event: DragEvent) {
       const componentType = event.dataTransfer?.getData("component-type");
       if (componentType) {
         const canvas = document.getElementById("canvas") as HTMLDivElement;
-        const x = event.clientX - canvas.getBoundingClientRect().left;
-        const y = event.clientY - canvas.getBoundingClientRect().top;
-        droppedComponents.value.push({ type: componentType, top: y, left: x });
+        const x =
+          event.clientX -
+          canvas.getBoundingClientRect().left -
+          clickOffset.value.x;
+        const y =
+          event.clientY -
+          canvas.getBoundingClientRect().top -
+          clickOffset.value.y;
+
+        droppedComponents.value.push({
+          type: componentType,
+          top: y,
+          left: x,
+        });
       }
     }
 
     function onDragStart(index: number, event: DragEvent) {
       event.dataTransfer?.setData("component-index", index.toString());
+
+      const draggedElement = event.currentTarget as HTMLDivElement;
+      const boundingRect = draggedElement.getBoundingClientRect();
+
+      // Calculamos el offset donde se hizo clic dentro del componente
+      clickOffset.value = {
+        x: event.clientX - boundingRect.left,
+        y: event.clientY - boundingRect.top,
+      };
     }
 
     function onDragEnd(index: number, event: DragEvent) {
       const canvas = document.getElementById("canvas") as HTMLDivElement;
-      const x = event.clientX - canvas.getBoundingClientRect().left;
-      const y = event.clientY - canvas.getBoundingClientRect().top;
+      const x =
+        event.clientX -
+        canvas.getBoundingClientRect().left -
+        clickOffset.value.x;
+      const y =
+        event.clientY -
+        canvas.getBoundingClientRect().top -
+        clickOffset.value.y;
+
       droppedComponents.value[index].top = y;
       droppedComponents.value[index].left = x;
     }
@@ -67,6 +97,7 @@ export default defineComponent({
 <style scoped lang="scss">
 #app {
   display: flex;
+  height: 100vh;
 }
 
 .workspace {
@@ -74,7 +105,7 @@ export default defineComponent({
   flex-grow: 1;
   background-color: #f9f9f9;
   border: 1px solid #ddd;
-  margin-left: 200px; /* Espacio para la barra de herramientas */
+  margin-left: 200px;
   height: 100vh;
   overflow: hidden;
 }
@@ -86,5 +117,6 @@ export default defineComponent({
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: move;
+  transition: transform 0.1s ease-in-out;
 }
 </style>
