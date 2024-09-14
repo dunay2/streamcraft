@@ -10,10 +10,17 @@
         draggable="true"
         @dragstart="onDragStart(index, $event)"
         @dragend="onDragEnd(index, $event)"
+        @dblclick="openEditModal(component)"
       >
         <DataObjectCard :type="component.type" :id="component.id" />
       </div>
     </div>
+    <EditModal
+      v-if="isEditModalOpen"
+      :component="selectedComponent"
+      @close="closeEditModal"
+      @save="saveComponent"
+    />
   </div>
 </template>
 
@@ -22,11 +29,13 @@ import { defineComponent, ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import ComponentToolbar from "./components/ComponentToolbar.vue";
 import DataObjectCard from "./components/DataObjectCard.vue";
+import EditModal from "./components/EditModal.vue";
 
 export default defineComponent({
   components: {
     ComponentToolbar,
     DataObjectCard,
+    EditModal,
   },
   setup() {
     const droppedComponents = ref<
@@ -39,6 +48,44 @@ export default defineComponent({
     >([]);
 
     const clickOffset = ref({ x: 0, y: 0 });
+
+    const isEditModalOpen = ref(false);
+    const selectedComponent = ref<{
+      id: string;
+      type: "Table" | "View" | "Transformation";
+      top: number;
+      left: number;
+    } | null>(null);
+
+    function openEditModal(component: {
+      id: string;
+      type: "Table" | "View" | "Transformation";
+      top: number;
+      left: number;
+    }) {
+      selectedComponent.value = { ...component };
+      isEditModalOpen.value = true;
+    }
+
+    function closeEditModal() {
+      isEditModalOpen.value = false;
+      selectedComponent.value = null;
+    }
+
+    function saveComponent(updatedComponent: {
+      id: string;
+      type: "Table" | "View" | "Transformation";
+      top: number;
+      left: number;
+    }) {
+      const index = droppedComponents.value.findIndex(
+        (comp) => comp.id === updatedComponent.id
+      );
+      if (index !== -1) {
+        droppedComponents.value[index] = updatedComponent;
+      }
+      closeEditModal();
+    }
 
     function onDrop(event: DragEvent) {
       const componentType = event.dataTransfer?.getData("component-type") as
@@ -98,6 +145,11 @@ export default defineComponent({
       onDrop,
       onDragStart,
       onDragEnd,
+      openEditModal,
+      closeEditModal,
+      saveComponent,
+      isEditModalOpen,
+      selectedComponent,
     };
   },
 });
