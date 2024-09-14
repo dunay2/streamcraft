@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-backdrop">
+  <div v-if="isModalOpen" class="modal-backdrop">
     <div class="modal">
       <h3>Edit Component</h3>
       <label for="id">ID:</label>
@@ -13,7 +13,7 @@
       </select>
 
       <button @click="saveChanges">Save</button>
-      <button @click="$emit('close')">Cancel</button>
+      <button @click="closeModal">Cancel</button>
     </div>
   </div>
 </template>
@@ -29,28 +29,42 @@ export default defineComponent({
         type: "Table" | "View" | "Transformation";
         top: number;
         left: number;
-      }>,
-      required: true,
+      } | null>,
+      required: true, // Se espera que siempre haya un componente a editar
+    },
+    isModalOpen: {
+      type: Boolean,
+      required: true, // Para controlar si el modal está abierto o cerrado
     },
   },
+  emits: ["save", "close"],
   setup(props, { emit }) {
     const componentData = ref({ ...props.component });
 
     watch(
       () => props.component,
       (newComponent) => {
-        componentData.value = { ...newComponent };
+        if (newComponent) {
+          componentData.value = { ...newComponent };
+        }
       },
       { immediate: true, deep: true }
     );
 
     function saveChanges() {
+      // Emitimos el componente actualizado al padre para que lo maneje
       emit("save", componentData.value);
+      closeModal();
+    }
+
+    function closeModal() {
+      emit("close");
     }
 
     return {
       componentData,
       saveChanges,
+      closeModal,
     };
   },
 });

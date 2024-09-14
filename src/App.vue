@@ -11,6 +11,7 @@
     <EditModal
       v-if="isEditModalOpen"
       :component="selectedComponent"
+      :isModalOpen="isEditModalOpen"
       @close="closeEditModal"
       @save="saveComponent"
     />
@@ -56,8 +57,17 @@ export default defineComponent({
       top: number;
       left: number;
     }) {
-      selectedComponent.value = { ...component };
-      isEditModalOpen.value = true;
+      if (
+        component.id &&
+        component.type &&
+        component.top !== undefined &&
+        component.left !== undefined
+      ) {
+        selectedComponent.value = { ...component };
+        isEditModalOpen.value = true;
+      } else {
+        console.error("Faltan campos obligatorios en el componente.");
+      }
     }
 
     function closeEditModal() {
@@ -133,10 +143,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped lang="scss">
-#app {
-  display: flex;
-  height: 100vh;
-}
-</style>
