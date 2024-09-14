@@ -86,46 +86,46 @@ export default defineComponent({
 
 .modal {
   background-color: #ffffff;
-  padding: 30px;
-  border-radius: 12px;
-  width: 400px;
-  max-width: 100%;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px; /* Ancho reducido */
+  max-width: 90%; /* Se ajusta para pantallas pequeñas */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
   animation: fadeIn 0.3s ease-in-out;
 }
 
 .modal h3 {
-  font-size: 20px;
+  font-size: 16px; /* Tamaño de letra más pequeño */
   font-weight: 600;
-  margin-bottom: 15px;
+  margin-bottom: 10px; /* Espacio inferior más pequeño */
   color: #2c3e50;
 }
 
 .modal label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 4px; /* Espacio reducido */
   font-weight: 500;
 }
 
 .modal input,
 .modal select {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 20px;
+  padding: 6px; /* Padding reducido */
+  margin-bottom: 15px; /* Menos espacio entre campos */
   border: 1px solid #dfe6e9;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 12px; /* Fuente más pequeña */
 }
 
 .modal button {
-  padding: 10px 20px;
+  padding: 8px 16px; /* Botones más compactos */
   background-color: #42b983;
   border: none;
   border-radius: 6px;
   color: white;
-  font-size: 14px;
+  font-size: 12px; /* Tamaño de letra reducido */
   cursor: pointer;
-  margin-right: 10px;
+  margin-right: 8px; /* Espacio reducido entre botones */
   transition: background-color 0.2s ease-in-out;
 }
 
