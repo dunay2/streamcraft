@@ -2,6 +2,7 @@
   <div class="data-object-card">
     <h2>{{ title }}</h2>
     <p>{{ description }}</p>
+    <p>ID: {{ id }}</p>
     <button @click="handleAction">Perform {{ type }} Action</button>
   </div>
 </template>
@@ -14,6 +15,10 @@ export default defineComponent({
     type: {
       type: String as PropType<"Table" | "View" | "Transformation">, // Tipo de componente desde la barra
       default: "Table",
+    },
+    id: {
+      type: String, // Añadimos el ID como una propiedad
+      required: true,
     },
   },
   setup(props) {

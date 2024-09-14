@@ -4,14 +4,14 @@
     <div id="canvas" class="workspace" @dragover.prevent @drop="onDrop">
       <div
         v-for="(component, index) in droppedComponents"
-        :key="index"
+        :key="component.id"
         class="dropped-component"
         :style="{ top: component.top + 'px', left: component.left + 'px' }"
         draggable="true"
         @dragstart="onDragStart(index, $event)"
         @dragend="onDragEnd(index, $event)"
       >
-        <DataObjectCard :type="component.type" />
+        <DataObjectCard :type="component.type" :id="component.id" />
       </div>
     </div>
   </div>
@@ -19,6 +19,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { v4 as uuidv4 } from "uuid";
 import ComponentToolbar from "./components/ComponentToolbar.vue";
 import DataObjectCard from "./components/DataObjectCard.vue";
 
@@ -29,14 +30,22 @@ export default defineComponent({
   },
   setup() {
     const droppedComponents = ref<
-      { type: string; top: number; left: number }[]
+      {
+        id: string;
+        type: "Table" | "View" | "Transformation";
+        top: number;
+        left: number;
+      }[] // <--- Usamos los valores correctos aquí.
     >([]);
 
-    // Variables para almacenar el offset del clic dentro del componente
     const clickOffset = ref({ x: 0, y: 0 });
 
     function onDrop(event: DragEvent) {
-      const componentType = event.dataTransfer?.getData("component-type");
+      const componentType = event.dataTransfer?.getData("component-type") as
+        | "Table"
+        | "View"
+        | "Transformation";
+
       if (componentType) {
         const canvas = document.getElementById("canvas") as HTMLDivElement;
         const x =
@@ -49,6 +58,7 @@ export default defineComponent({
           clickOffset.value.y;
 
         droppedComponents.value.push({
+          id: uuidv4(), // <--- Generamos un ID único para cada componente
           type: componentType,
           top: y,
           left: x,
@@ -62,7 +72,6 @@ export default defineComponent({
       const draggedElement = event.currentTarget as HTMLDivElement;
       const boundingRect = draggedElement.getBoundingClientRect();
 
-      // Calculamos el offset donde se hizo clic dentro del componente
       clickOffset.value = {
         x: event.clientX - boundingRect.left,
         y: event.clientY - boundingRect.top,
