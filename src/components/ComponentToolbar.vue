@@ -8,7 +8,7 @@
         @dragstart="onDragStart(component, $event)"
         draggable="true"
       >
-        {{ component }}
+        <i :class="getIconClass(component)"></i> {{ component }}
       </li>
     </ul>
   </div>
@@ -25,9 +25,23 @@ export default defineComponent({
       event.dataTransfer?.setData("component-type", component);
     }
 
+    function getIconClass(component: string) {
+      switch (component) {
+        case "Table":
+          return "fas fa-table";
+        case "View":
+          return "fas fa-eye";
+        case "Transformation":
+          return "fas fa-exchange-alt";
+        default:
+          return "fas fa-question-circle"; // Icono por defecto
+      }
+    }
+
     return {
       components,
       onDragStart,
+      getIconClass,
     };
   },
 });
@@ -38,19 +52,20 @@ export default defineComponent({
   position: fixed;
   top: 0;
   left: 0;
-  width: 180px; /* Ajustamos el tamaño a 180px para una barra más compacta */
+  width: 180px;
   background-color: #f4f4f4;
-  padding: 15px; /* Un poco más de espacio */
+  padding: 10px;
   border-right: 1px solid #ddd;
-  height: 100vh; /* Asegurar que ocupe toda la altura */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera para resaltar */
-  font-size: 14px; /* Tamaño de fuente reducido */
+  height: 100vh;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  overflow-y: auto;
 }
 
 .component-toolbar h3 {
   font-size: 16px;
   margin-bottom: 20px;
-  color: #2c3e50; /* Color más oscuro para el título */
+  color: #2c3e50;
 }
 
 ul {
@@ -59,36 +74,43 @@ ul {
 }
 
 li {
+  display: flex;
+  align-items: center;
   padding: 12px;
   border: 1px solid #ccc;
-  border-radius: 6px; /* Un poco más redondeado */
+  border-radius: 6px;
   margin-bottom: 10px;
   background-color: #ffffff;
   cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
     background-color: #eaeaea;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra más notoria al hacer hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 }
 
+li i {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
 li.active {
-  background-color: #e1e1e1; /* Color distinto para el activo */
+  background-color: #e1e1e1;
   border-color: #bbb;
 }
 
 li + li {
-  margin-top: 10px; /* Separación entre elementos */
+  margin-top: 10px;
 }
 
 body {
-  font-size: 14px; /* Reducimos el tamaño de fuente general para toda la app */
-  font-family: "Arial", sans-serif; /* Fuente general */
+  font-size: 14px;
+  font-family: "Arial", sans-serif;
 }
 
 button {
-  font-size: 13px; /* Botones más pequeños */
+  font-size: 13px;
   padding: 8px 10px;
   border-radius: 6px;
   border: none;
