@@ -1,20 +1,13 @@
 <template>
   <div id="app">
     <ComponentToolbar />
-    <div id="canvas" class="workspace" @dragover.prevent @drop="onDrop">
-      <div
-        v-for="(component, index) in droppedComponents"
-        :key="component.id"
-        class="dropped-component"
-        :style="{ top: component.top + 'px', left: component.left + 'px' }"
-        draggable="true"
-        @dragstart="onDragStart(index, $event)"
-        @dragend="onDragEnd(index, $event)"
-        @dblclick="openEditModal(component)"
-      >
-        <DataObjectCard :type="component.type" :id="component.id" />
-      </div>
-    </div>
+    <WorkspaceCanvas
+      :droppedComponents="droppedComponents"
+      @drop="onDrop"
+      @dragstart="onDragStart"
+      @dragend="onDragEnd"
+      @openEditModal="openEditModal"
+    />
     <EditModal
       v-if="isEditModalOpen"
       :component="selectedComponent"
@@ -28,13 +21,13 @@
 import { defineComponent, ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import ComponentToolbar from "./components/ComponentToolbar.vue";
-import DataObjectCard from "./components/DataObjectCard.vue";
+import WorkspaceCanvas from "./components/WorkspaceCanvas.vue";
 import EditModal from "./components/EditModal.vue";
 
 export default defineComponent({
   components: {
     ComponentToolbar,
-    DataObjectCard,
+    WorkspaceCanvas,
     EditModal,
   },
   setup() {
@@ -44,10 +37,8 @@ export default defineComponent({
         type: "Table" | "View" | "Transformation";
         top: number;
         left: number;
-      }[] // <--- Usamos los valores correctos aquí.
+      }[]
     >([]);
-
-    const clickOffset = ref({ x: 0, y: 0 });
 
     const isEditModalOpen = ref(false);
     const selectedComponent = ref<{
@@ -56,6 +47,8 @@ export default defineComponent({
       top: number;
       left: number;
     } | null>(null);
+
+    const clickOffset = ref({ x: 0, y: 0 });
 
     function openEditModal(component: {
       id: string;
@@ -95,17 +88,11 @@ export default defineComponent({
 
       if (componentType) {
         const canvas = document.getElementById("canvas") as HTMLDivElement;
-        const x =
-          event.clientX -
-          canvas.getBoundingClientRect().left -
-          clickOffset.value.x;
-        const y =
-          event.clientY -
-          canvas.getBoundingClientRect().top -
-          clickOffset.value.y;
+        const x = event.clientX - canvas.getBoundingClientRect().left;
+        const y = event.clientY - canvas.getBoundingClientRect().top;
 
         droppedComponents.value.push({
-          id: uuidv4(), // <--- Generamos un ID único para cada componente
+          id: uuidv4(),
           type: componentType,
           top: y,
           left: x,
@@ -113,16 +100,8 @@ export default defineComponent({
       }
     }
 
-    function onDragStart(index: number, event: DragEvent) {
-      event.dataTransfer?.setData("component-index", index.toString());
-
-      const draggedElement = event.currentTarget as HTMLDivElement;
-      const boundingRect = draggedElement.getBoundingClientRect();
-
-      clickOffset.value = {
-        x: event.clientX - boundingRect.left,
-        y: event.clientY - boundingRect.top,
-      };
+    function onDragStart(index: number, offset: { x: number; y: number }) {
+      clickOffset.value = offset;
     }
 
     function onDragEnd(index: number, event: DragEvent) {
@@ -159,30 +138,5 @@ export default defineComponent({
 #app {
   display: flex;
   height: 100vh;
-}
-
-.workspace {
-  position: relative;
-  flex-grow: 1;
-  background-color: #f0f3f4;
-  border: 1px solid #dfe6e9;
-  margin-left: 200px;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.dropped-component {
-  position: absolute;
-  padding: 0px;
-  border: none;
-  margin: 0;
-  background-color: transparent;
-  box-shadow: none;
-  cursor: move;
-  transition: transform 0.1s ease-in-out;
-}
-
-.dropped-component:hover {
-  box-shadow: none;
 }
 </style>
