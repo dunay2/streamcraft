@@ -13,9 +13,9 @@ export interface INode {
   /**
    * @property {Set<INode>} connections
    * @description
-   * Conjunto de nodos a los que este nodo está conectado directamente.
+   * Conjunto de nodos a los que este nodo está conectado directamente. El uso de Set garantiza que no haya duplicados.
    */
-  connections: Set<INode>; // Nodos conectados (ahora con Set para evitar duplicados)
+  connections: Set<INode>; // Nodos conectados (Set para evitar duplicados)
 
   /**
    * @property {NodeState} state
@@ -25,11 +25,11 @@ export interface INode {
   state: NodeState; // Estado del nodo
 
   /**
-   * @property {Record<string, any>} [metadata]
+   * @property {Record<string, unknown>} [metadata]
    * @description
-   * Información adicional o metadatos que se pueden asociar al nodo.
+   * Información adicional o metadatos que se pueden asociar al nodo. Este campo es opcional.
    */
-  metadata?: Record<string, any>; // Metadatos opcionales para almacenamiento adicional
+  metadata?: Record<string, unknown>; // Metadatos opcionales para almacenamiento adicional
 
   /**
    * @method setState
@@ -42,16 +42,16 @@ export interface INode {
   /**
    * @method connect
    * @description
-   * Conecta el nodo actual con otro nodo.
+   * Conecta el nodo actual con otro nodo. Si es bidireccional, se conecta en ambos sentidos.
    * @param {INode} targetNode - El nodo con el que queremos establecer la conexión.
-   * @param {boolean} [bidirectional=true] - Si es true, también se conecta el nodo objetivo al nodo actual, creando una conexión bidireccional.
+   * @param {boolean} [bidirectional=true] - Si es true, también se conecta el nodo objetivo al nodo actual.
    */
   connect(targetNode: INode, bidirectional?: boolean): void;
 
   /**
    * @method disconnect
    * @description
-   * Desconecta el nodo actual del nodo objetivo.
+   * Desconecta el nodo actual del nodo objetivo. Si es bidireccional, se desconecta en ambos sentidos.
    * @param {INode} targetNode - El nodo del que queremos desconectar el nodo actual.
    * @param {boolean} [bidirectional=true] - Si es true, también se desconecta el nodo objetivo del nodo actual.
    */
@@ -74,6 +74,13 @@ export interface INode {
    * @returns {boolean} - Retorna true si el nodo puede conectarse al nodo objetivo, de lo contrario retorna false.
    */
   canConnect(targetNode: INode): boolean;
+
+  /**
+   * @method getConnectedNodes
+   * @description Devuelve una lista de nodos conectados al nodo actual.
+   * @returns {INode[]} - Lista de nodos conectados.
+   */
+  getConnectedNodes(): INode[];
 
   /**
    * @method toJSON
