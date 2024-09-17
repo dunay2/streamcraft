@@ -1,145 +1,89 @@
 <template>
-  <div id="app">
-    <ComponentToolbar />
-    <WorkspaceCanvas
-      :droppedComponents="droppedComponents"
-      @drop="onDrop"
-      @dragstart="onDragStart"
-      @dragend="onDragEnd"
-      @openEditModal="openEditModal"
-    />
-    <EditModal
-      v-if="isEditModalOpen"
-      :component="selectedComponent"
-      :isModalOpen="isEditModalOpen"
-      @close="closeEditModal"
-      @save="saveComponent"
-    />
+  <div>
+    <!-- Barra de herramientas horizontal -->
+    <div class="toolbar">
+      <p>Barra de herramientas</p>
+    </div>
+
+    <!-- Contenedor principal para el área de trabajo -->
+    <div class="main-content">
+      <!-- Barra lateral para componentes -->
+      <div class="sidebar">
+        <p>Componentes</p>
+        <ul>
+          <li>Componente 1</li>
+          <li>Componente 2</li>
+        </ul>
+      </div>
+
+      <!-- Área de trabajo -->
+      <div class="workspace">
+        <h2>Área de trabajo</h2>
+        <p>Aquí puedes desarrollar las funcionalidades clave</p>
+      </div>
+    </div>
+
+    <!-- Log simple en la parte inferior -->
+    <div class="log-area">
+      <p>Log: Aquí se mostrarán las acciones del usuario</p>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import { v4 as uuidv4 } from "uuid";
-import ComponentToolbar from "./components/ComponentToolbar.vue";
-import WorkspaceCanvas from "./components/WorkspaceCanvas.vue";
-import EditModal from "./components/EditModal.vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  components: {
-    ComponentToolbar,
-    WorkspaceCanvas,
-    EditModal,
-  },
   setup() {
-    const droppedComponents = ref<
-      {
-        id: string;
-        type: "Table" | "View" | "Transformation";
-        top: number;
-        left: number;
-      }[]
-    >([]);
-
-    const isEditModalOpen = ref(false);
-    const selectedComponent = ref<{
-      id: string;
-      type: "Table" | "View" | "Transformation";
-      top: number;
-      left: number;
-    } | null>(null);
-
-    const clickOffset = ref({ x: 0, y: 0 });
-
-    function openEditModal(component: {
-      id: string;
-      type: "Table" | "View" | "Transformation";
-      top: number;
-      left: number;
-    }) {
-      if (
-        component.id &&
-        component.type &&
-        component.top !== undefined &&
-        component.left !== undefined
-      ) {
-        selectedComponent.value = { ...component };
-        isEditModalOpen.value = true;
-      } else {
-        console.error("Faltan campos obligatorios en el componente.");
-      }
-    }
-
-    function closeEditModal() {
-      isEditModalOpen.value = false;
-      selectedComponent.value = null;
-    }
-
-    function saveComponent(updatedComponent: {
-      id: string;
-      type: "Table" | "View" | "Transformation";
-      top: number;
-      left: number;
-    }) {
-      const index = droppedComponents.value.findIndex(
-        (comp) => comp.id === updatedComponent.id
-      );
-      if (index !== -1) {
-        droppedComponents.value[index] = updatedComponent;
-      }
-      closeEditModal();
-    }
-
-    function onDrop(event: DragEvent) {
-      const componentType = event.dataTransfer?.getData("component-type") as
-        | "Table"
-        | "View"
-        | "Transformation";
-
-      if (componentType) {
-        const canvas = document.getElementById("canvas") as HTMLDivElement;
-        const x = event.clientX - canvas.getBoundingClientRect().left;
-        const y = event.clientY - canvas.getBoundingClientRect().top;
-
-        droppedComponents.value.push({
-          id: uuidv4(),
-          type: componentType,
-          top: y,
-          left: x,
-        });
-      }
-    }
-
-    function onDragStart(index: number, offset: { x: number; y: number }) {
-      clickOffset.value = offset;
-    }
-
-    function onDragEnd(index: number, event: DragEvent) {
-      const canvas = document.getElementById("canvas") as HTMLDivElement;
-      const x =
-        event.clientX -
-        canvas.getBoundingClientRect().left -
-        clickOffset.value.x;
-      const y =
-        event.clientY -
-        canvas.getBoundingClientRect().top -
-        clickOffset.value.y;
-
-      droppedComponents.value[index].top = y;
-      droppedComponents.value[index].left = x;
-    }
-
-    return {
-      droppedComponents,
-      onDrop,
-      onDragStart,
-      onDragEnd,
-      openEditModal,
-      closeEditModal,
-      saveComponent,
-      isEditModalOpen,
-      selectedComponent,
-    };
+    // Aquí podrías agregar la lógica de la funcionalidad de la barra de herramientas
   },
 });
 </script>
+
+<style scoped lang="scss">
+/* Estilo general para la barra de herramientas */
+.toolbar {
+  height: 50px; /* Altura de la barra de herramientas */
+  background-color: #f5f5f5;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Contenedor principal para la barra lateral y el área de trabajo */
+.main-content {
+  display: flex; /* Flex para que la barra lateral y el workspace estén en fila */
+  flex-grow: 1;
+  height: calc(
+    100vh - 100px
+  ); /* Altura dinámica menos la barra de herramientas y el log */
+}
+
+/* Estilo para la barra lateral */
+.sidebar {
+  width: 220px; /* Ancho fijo de la barra lateral */
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+/* Área de trabajo principal */
+.workspace {
+  flex-grow: 1; /* Ocupa todo el espacio disponible al lado de la barra lateral */
+  background-color: #ffffff;
+  padding: 20px;
+  overflow-y: auto; /* Scroll vertical si es necesario */
+}
+
+/* Área del log en la parte inferior */
+.log-area {
+  height: 50px; /* Altura del log */
+  background-color: #e0e0e0;
+  padding: 10px;
+  text-align: center;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+}
+</style>
