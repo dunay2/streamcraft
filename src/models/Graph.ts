@@ -62,6 +62,16 @@ export class Graph {
   }
 
   /**
+   * @method getNodeById
+   * @description Devuelve un nodo por su ID.
+   * @param {string} nodeId - El ID del nodo que se quiere obtener.
+   * @returns {Node | undefined} - El nodo encontrado o undefined si no existe.
+   */
+  getNodeById(nodeId: string): INode | undefined {
+    return this.nodes.get(nodeId);
+  }
+
+  /**
    * @method removeNode
    * @description Elimina un nodo del grafo y desconecta todos los nodos conectados a él.
    * @param {string} nodeId - El ID del nodo que se va a eliminar.
