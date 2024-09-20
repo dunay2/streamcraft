@@ -1,18 +1,19 @@
 <template>
-  <div ref="cardRef" class="data-object-card">
+  <div class="data-object-card" ref="cardRef">
     <h2>{{ title }}</h2>
-    <p>{{ description }}</p>
     <p>ID: {{ id }}</p>
-    <button @click="handleAction">Perform {{ type }} Action</button>
+    <p>Type: {{ type }}</p>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, PropType } from "vue";
-import { jsPlumb, EndpointOptions } from "jsplumb"; // Importamos jsPlumb
+import { useStore } from "vuex";
+import { Card } from "@/models/Card"; // Importamos la clase Card
+import { Node } from "@/models/Node"; // Importamos la clase Node
 
 export default defineComponent({
-  name: "DataObjectCard", // Nombre multi-palabra
+  name: "DataObjectCard",
   props: {
     type: {
       type: String as PropType<"Table" | "View" | "Transformation">,
@@ -24,48 +25,32 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const store = useStore();
     const title = computed(() => `${props.type} Object`);
-    const description = computed(
-      () => `This is a ${props.type.toLowerCase()} object.`
-    );
     const cardRef = ref<HTMLDivElement | null>(null);
 
-    let jsPlumbInstance = jsPlumb.getInstance();
-
-    const endpointOptions: EndpointOptions = {
-      anchor: "Continuous",
-      isSource: true,
-      isTarget: true,
-      connector: ["Straight", {}],
-      endpoint: "Dot",
-      maxConnections: -1,
-    };
+    const jsPlumbInstance = store.getters.jsPlumbInstance;
+    const graphInstance = store.getters.graphInstance;
 
     onMounted(() => {
       if (cardRef.value) {
-        // Hacemos que la tarjeta sea arrastrable
-        jsPlumbInstance.draggable(cardRef.value);
+        const nodeInstance = new Node(props.id, props.type);
 
-        // Añadir el punto de conexión con las opciones
-        jsPlumbInstance.addEndpoint(cardRef.value, endpointOptions);
+        const cardInstance = new Card(
+          nodeInstance,
+          100,
+          100,
+          jsPlumbInstance,
+          graphInstance
+        );
 
-        // Escuchar cuando se establece una conexión
-        jsPlumbInstance.bind("connection", (info) => {
-          console.log(`Conectado: ${info.sourceId} -> ${info.targetId}`);
-        });
+        cardInstance.init(cardRef.value); // Llamamos a la lógica desde la clase Card
       }
     });
 
-    function handleAction() {
-      console.log(`Action performed on ${props.type}`);
-      alert(`Action executed for ${props.type}`);
-    }
-
     return {
       title,
-      description,
       cardRef,
-      handleAction,
     };
   },
 });
@@ -79,14 +64,14 @@ export default defineComponent({
   width: 160px;
   border-radius: 8px;
   background-color: #ffffff;
-  box-shadow: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 10px;
-  transition: none;
+  cursor: move;
+  transition: box-shadow 0.3s ease;
 }
 
 .data-object-card:hover {
-  transform: none;
-  box-shadow: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .data-object-card h2 {
@@ -98,22 +83,6 @@ export default defineComponent({
 
 .data-object-card p {
   color: #636e72;
-  margin-bottom: 8px;
   font-size: 12px;
-}
-
-.data-object-card button {
-  background-color: #42b983;
-  border: 1px solid #ddd;
-  color: white;
-  padding: 4px 6px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: background-color 0.2s;
-}
-
-.data-object-card button:hover {
-  background-color: #36a273;
 }
 </style>

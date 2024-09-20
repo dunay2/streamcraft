@@ -34,7 +34,12 @@ export class Card {
         maxConnections: -1,
       };
 
-      this.instance.addEndpoint(cardRef, endpointOptions);
+      this.instance.addEndpoint(cardRef, {
+        ...endpointOptions, // Expansión del objeto para permitir sobrescritura de opciones
+        isSource: true, // Confirmar que actúa como fuente
+        isTarget: true, // Confirmar que actúa como destino
+      });
+
       this.instance.draggable(cardRef);
 
       // Uso de `bind` en lugar de `on` para manejar conexiones
@@ -53,6 +58,22 @@ export class Card {
         console.log(`Desconectando ${sourceId} de ${targetId}`);
 
         this.handleDisconnection(sourceId, targetId);
+      });
+
+      this.instance.bind("beforeDrop", (info) => {
+        console.log("Intentando conectar", info.sourceId, "con", info.targetId);
+        if (info.sourceId === info.targetId) {
+          console.warn("No se puede conectar un nodo consigo mismo");
+          return false; // Rechazar la conexión
+        }
+        return true; // Permite la conexión
+      });
+
+      // Verificar errores en el proceso
+      this.instance.bind("connectionMoved", (info) => {
+        console.log(
+          `Conexión movida: ${info.originalSourceId} -> ${info.newSourceId}`
+        );
       });
     }
   }
