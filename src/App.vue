@@ -16,7 +16,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import { jsPlumb } from "jsplumb";
-import CanvasCard from "@/components/CanvasCard.vue";
+import CanvasCard from "@/components/DataObjectCard.vue";
 
 export default defineComponent({
   name: "App",

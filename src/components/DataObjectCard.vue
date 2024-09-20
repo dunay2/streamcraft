@@ -1,5 +1,5 @@
 <template>
-  <div class="data-object-card">
+  <div ref="cardRef" class="data-object-card">
     <h2>{{ title }}</h2>
     <p>{{ description }}</p>
     <p>ID: {{ id }}</p>
@@ -8,32 +8,53 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, PropType } from "vue";
+import { defineComponent, ref, onMounted, computed, PropType } from "vue";
+import { jsPlumb, EndpointOptions } from "jsplumb"; // Importamos jsPlumb
 
 export default defineComponent({
+  name: "DataObjectCard", // Nombre multi-palabra
   props: {
     type: {
-      type: String as PropType<"Table" | "View" | "Transformation">, // Tipo de componente desde la barra
+      type: String as PropType<"Table" | "View" | "Transformation">,
       default: "Table",
     },
     id: {
-      type: String, // Añadimos el ID como una propiedad
+      type: String,
       required: true,
     },
   },
   setup(props) {
-    const title = ref<string>(`${props.type} Object`);
-    const description = ref<string>(
-      `This is a ${props.type.toLowerCase()} object.`
+    const title = computed(() => `${props.type} Object`);
+    const description = computed(
+      () => `This is a ${props.type.toLowerCase()} object.`
     );
+    const cardRef = ref<HTMLDivElement | null>(null);
 
-    watch(
-      () => props.type,
-      (newType) => {
-        title.value = `${newType} Object`;
-        description.value = `This is a ${newType.toLowerCase()} object.`;
+    let jsPlumbInstance = jsPlumb.getInstance();
+
+    const endpointOptions: EndpointOptions = {
+      anchor: "Continuous",
+      isSource: true,
+      isTarget: true,
+      connector: ["Straight", {}],
+      endpoint: "Dot",
+      maxConnections: -1,
+    };
+
+    onMounted(() => {
+      if (cardRef.value) {
+        // Hacemos que la tarjeta sea arrastrable
+        jsPlumbInstance.draggable(cardRef.value);
+
+        // Añadir el punto de conexión con las opciones
+        jsPlumbInstance.addEndpoint(cardRef.value, endpointOptions);
+
+        // Escuchar cuando se establece una conexión
+        jsPlumbInstance.bind("connection", (info) => {
+          console.log(`Conectado: ${info.sourceId} -> ${info.targetId}`);
+        });
       }
-    );
+    });
 
     function handleAction() {
       console.log(`Action performed on ${props.type}`);
@@ -43,28 +64,27 @@ export default defineComponent({
     return {
       title,
       description,
+      cardRef,
       handleAction,
     };
   },
 });
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .data-object-card {
+  position: absolute;
   border: 1px solid #dfe6e9;
   padding: 10px;
   width: 160px;
   border-radius: 8px;
   background-color: #ffffff;
-  /* Eliminamos cualquier sombra */
   box-shadow: none;
   margin-bottom: 10px;
-  /* Eliminamos cualquier transformación al hacer hover */
   transition: none;
 }
 
 .data-object-card:hover {
-  /* Aseguramos que no hay transformaciones en hover */
   transform: none;
   box-shadow: none;
 }
