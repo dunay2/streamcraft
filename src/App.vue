@@ -1,89 +1,68 @@
 <template>
-  <div>
-    <!-- Barra de herramientas horizontal -->
-    <div class="toolbar">
-      <p>Barra de herramientas</p>
-    </div>
-
-    <!-- Contenedor principal para el área de trabajo -->
-    <div class="main-content">
-      <!-- Barra lateral para componentes -->
-      <div class="sidebar">
-        <p>Componentes</p>
-        <ul>
-          <li>Componente 1</li>
-          <li>Componente 2</li>
-        </ul>
-      </div>
-
-      <!-- Área de trabajo -->
-      <div class="workspace">
-        <h2>Área de trabajo</h2>
-        <p>Aquí puedes desarrollar las funcionalidades clave</p>
-      </div>
-    </div>
-
-    <!-- Log simple en la parte inferior -->
-    <div class="log-area">
-      <p>Log: Aquí se mostrarán las acciones del usuario</p>
+  <div id="app">
+    <h1>Canvas Flow</h1>
+    <div ref="canvasRef" class="canvas">
+      <!-- V-for para generar múltiples CanvasCards dinámicamente -->
+      <CanvasCard
+        v-for="card in cards"
+        :key="card.id"
+        :id="card.id"
+        :type="card.type"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
+import { jsPlumb } from "jsplumb";
+import CanvasCard from "@/components/CanvasCard.vue";
 
 export default defineComponent({
+  name: "App",
+  components: {
+    CanvasCard,
+  },
   setup() {
-    // Aquí podrías agregar la lógica de la funcionalidad de la barra de herramientas
+    const canvasRef = ref<HTMLElement | null>(null);
+    const jsPlumbInstance = ref(jsPlumb.getInstance());
+
+    const cards = ref<
+      { id: string; type: "Table" | "View" | "Transformation" }[]
+    >([
+      { id: "card1", type: "Table" },
+      { id: "card2", type: "View" },
+      { id: "card3", type: "Transformation" },
+    ]);
+
+    onMounted(() => {
+      if (canvasRef.value) {
+        // Establecer el contenedor de jsPlumb como el canvas
+        jsPlumbInstance.value.setContainer(canvasRef.value);
+      }
+    });
+
+    return {
+      canvasRef,
+      cards,
+      jsPlumbInstance,
+    };
   },
 });
 </script>
 
-<style scoped lang="scss">
-/* Estilo general para la barra de herramientas */
-.toolbar {
-  height: 50px; /* Altura de la barra de herramientas */
-  background-color: #f5f5f5;
-  padding: 10px;
+<style scoped>
+#app {
   text-align: center;
-  font-weight: bold;
-}
-
-/* Contenedor principal para la barra lateral y el área de trabajo */
-.main-content {
-  display: flex; /* Flex para que la barra lateral y el workspace estén en fila */
-  flex-grow: 1;
-  height: calc(
-    100vh - 100px
-  ); /* Altura dinámica menos la barra de herramientas y el log */
-}
-
-/* Estilo para la barra lateral */
-.sidebar {
-  width: 220px; /* Ancho fijo de la barra lateral */
-  background-color: #f5f5f5;
-  padding: 10px;
-  border-right: 1px solid #ddd;
-}
-
-/* Área de trabajo principal */
-.workspace {
-  flex-grow: 1; /* Ocupa todo el espacio disponible al lado de la barra lateral */
-  background-color: #ffffff;
   padding: 20px;
-  overflow-y: auto; /* Scroll vertical si es necesario */
 }
 
-/* Área del log en la parte inferior */
-.log-area {
-  height: 50px; /* Altura del log */
-  background-color: #e0e0e0;
-  padding: 10px;
-  text-align: center;
+.canvas {
   position: relative;
-  bottom: 0;
   width: 100%;
-  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+  height: 600px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  overflow: hidden;
 }
 </style>
