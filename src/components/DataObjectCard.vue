@@ -1,7 +1,7 @@
 <template>
   <div class="data-object-card" ref="cardRef">
     <h2>{{ title }}</h2>
-    <p>ID: {{ id }}</p>
+    <p>ID: {{ cardId }}</p>
     <p>Type: {{ type }}</p>
   </div>
 </template>
@@ -19,37 +19,41 @@ export default defineComponent({
       type: String as PropType<"Table" | "View" | "Transformation">,
       default: "Table",
     },
-    id: {
-      type: String,
-      required: true,
-    },
   },
   setup(props) {
     const store = useStore();
     const title = computed(() => `${props.type} Object`);
     const cardRef = ref<HTMLDivElement | null>(null);
+    const cardId = ref<string>("");
 
     const jsPlumbInstance = store.getters.jsPlumbInstance;
     const graphInstance = store.getters.graphInstance;
 
     onMounted(() => {
       if (cardRef.value) {
-        const nodeInstance = new Node(props.id, props.type);
-
         const cardInstance = new Card(
-          nodeInstance,
+          new Node("", props.type), // Dejamos el ID vacío por ahora
           100,
           100,
           jsPlumbInstance,
           graphInstance
         );
 
-        cardInstance.init(cardRef.value); // Llamamos a la lógica desde la clase Card
+        cardId.value = cardInstance.id; // Asignamos el ID generado a cardId
+        console.log("Card ID generado:", cardInstance.id);
+
+        // Ahora asignamos el ID generado al nodo
+        cardInstance.node.id = cardInstance.id;
+        console.log("Nodo con ID:", cardInstance.node.id);
+
+        // Inicializamos la lógica del Card
+        cardInstance.init(cardRef.value);
       }
     });
 
     return {
       title,
+      cardId,
       cardRef,
     };
   },
