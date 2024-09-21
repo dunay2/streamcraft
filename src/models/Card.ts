@@ -1,6 +1,7 @@
 import { Node } from "./Node";
 import { jsPlumbInstance, EndpointOptions } from "jsplumb";
 import { Graph } from "./Graph";
+import { generateUniqueId } from "../utils/uniqueIdGenerator"; // Generador de IDs únicos
 
 export class Card {
   node: Node;
@@ -8,6 +9,7 @@ export class Card {
   left: number;
   instance: jsPlumbInstance;
   graph: Graph;
+  id: string;
 
   constructor(
     node: Node,
@@ -21,10 +23,13 @@ export class Card {
     this.left = left;
     this.instance = instance;
     this.graph = graph;
+    this.id = generateUniqueId(); // Asignar un ID único a la tarjeta
   }
 
   init(cardRef: HTMLDivElement): void {
     if (cardRef && this.instance) {
+      cardRef.id = this.id;
+
       const endpointOptions: EndpointOptions = {
         anchor: "Continuous",
         isSource: true,
