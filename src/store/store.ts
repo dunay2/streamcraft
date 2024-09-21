@@ -1,8 +1,13 @@
 import { createStore } from "vuex";
 import { Graph } from "@/models/Graph";
-import { jsPlumb } from "jsplumb";
+import { jsPlumb, jsPlumbInstance } from "jsplumb";
 
-const store = createStore({
+interface IState {
+  graphInstance: Graph;
+  jsPlumbInstance: jsPlumbInstance;
+}
+
+const store = createStore<IState>({
   state: {
     graphInstance: new Graph(),
     jsPlumbInstance: jsPlumb.getInstance(),
@@ -11,7 +16,7 @@ const store = createStore({
     SET_GRAPH_INSTANCE(state, graph: Graph) {
       state.graphInstance = graph;
     },
-    SET_JSPLUMB_INSTANCE(state, instance: any) {
+    SET_JSPLUMB_INSTANCE(state, instance: jsPlumbInstance) {
       state.jsPlumbInstance = instance;
     },
   },
@@ -19,7 +24,7 @@ const store = createStore({
     initializeGraph({ commit }, graph: Graph) {
       commit("SET_GRAPH_INSTANCE", graph);
     },
-    initializeJsPlumb({ commit }, instance: any) {
+    initializeJsPlumb({ commit }, instance: jsPlumbInstance) {
       commit("SET_JSPLUMB_INSTANCE", instance);
     },
   },
