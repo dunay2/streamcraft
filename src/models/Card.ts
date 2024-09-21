@@ -1,9 +1,11 @@
 import { Node } from "./Node";
 import { jsPlumbInstance, EndpointOptions } from "jsplumb";
 import { Graph } from "./Graph";
-import { generateUniqueId } from "../utils/uniqueIdGenerator"; // Generador de IDs únicos
+import { generateUniqueId } from "../utils/uniqueIdGenerator";
+import { CardStrategy } from "../interfaces/CardStrategy";
 
 export class Card {
+  private strategy: CardStrategy;
   node: Node;
   top: number;
   left: number;
@@ -16,14 +18,31 @@ export class Card {
     top: number,
     left: number,
     instance: jsPlumbInstance,
-    graph: Graph
+    graph: Graph,
+    strategy: CardStrategy
   ) {
     this.node = node;
     this.top = top;
     this.left = left;
     this.instance = instance;
     this.graph = graph;
+    this.strategy = strategy;
     this.id = generateUniqueId(); // Asignar un ID único a la tarjeta
+  }
+
+  // Método para cambiar la estrategia
+  setStrategy(strategy: CardStrategy) {
+    this.strategy = strategy;
+  }
+
+  // Ejecuta la estrategia actual
+  executeStrategy(): void {
+    this.strategy.execute();
+  }
+
+  // Retorna el tipo de card según la estrategia actual
+  getCardType(): string {
+    return this.strategy.getType();
   }
 
   init(cardRef: HTMLDivElement): void {
